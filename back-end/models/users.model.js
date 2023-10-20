@@ -3,23 +3,20 @@ const bcrypt = require('bcrypt')
 const saltRound = 10
 const table = "users"
 
-const regisUser = (data, result) => {
-    const sqlAddUserId = `SELECT COUNT(user_id) AS countID FROM ${table}`
-    Connection.query(sqlAddUserId, (err, count) => {
-        const baseUserId = "Us-"
-        let count_id
-        if (err) {
+const getAlldata = (result) => {
+    const sql = `SELECT * FROM ${table} `
+    Connection.query(sql , (err , userall) => {
+        if(err){
             console.log(err);
+            result(err , null)
+            return
+        }else{
+            result(null , userall)
         }
-        else {
-            if (!!count[0].countID === false) {
-                count_id = 1
-            } else {
-                count_id = count[0].countID
-            }
-        }
-        const intId = parseInt(count_id+1)
-        data.user_id = baseUserId + intId
+    })
+}
+
+const regisUser = (data, result) => {
         const username = data.username
         const salt = bcrypt.genSaltSync(saltRound)
         data.password = bcrypt.hashSync(data.password, salt)
@@ -44,8 +41,21 @@ const regisUser = (data, result) => {
             }
         })
 
-    })
-}
+    }
+
+    const deleteUserOne = (id , result) => {
+        const sql = `DELETE FROM ${table} WHERE user_id = ? `
+        Connection.query(sql , [id] , (err , del) => {
+            if(err){
+                console.log(err);
+                result(err , null)
+                return
+            }else{
+                result(null , {status : 'ok' , message : "Deleted Data successfully"})
+            }
+        })
+    }
 
 
-module.exports = { regisUser }
+
+module.exports = {regisUser , getAlldata , deleteUserOne}

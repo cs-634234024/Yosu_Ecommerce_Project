@@ -7,7 +7,7 @@ const table = "users"
 const userLogin = (data , result) => {
     const username = data.username 
     const password = data.password
-    const sql = `SELECT username , password FROM ${table} WHERE username = ?  `
+    const sql = `SELECT * FROM ${table} WHERE username = ?  `
     Connection.query(sql , [username] , (err , results)=>{
         if(err){
             result(err , null)
@@ -19,7 +19,7 @@ const userLogin = (data , result) => {
             result(null ,{status : "Error" , message : "invalid password!"})
         }else{  
             
-            const token =  jwt.sign({username : username} , process.env.SECRET_KEY , {expiresIn:'1d'})
+            const token =  jwt.sign({userinfo : results[0]} , process.env.SECRET_KEY , {expiresIn:'1d'})
             console.log(token);
             result(null ,{status : "ok" , message : "Login successfully" , token : token})
         }
